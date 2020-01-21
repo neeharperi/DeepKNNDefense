@@ -1,0 +1,10 @@
+pip install torch
+pip install torchvision
+pip install opencv-python
+pip install tqdm
+pip install pandas
+pip install argparse
+pip install pprint
+pip install Pillow
+pip install sklearn
+
