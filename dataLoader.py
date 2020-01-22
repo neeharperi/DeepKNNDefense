@@ -92,15 +92,19 @@ class ConvexPolytopeFineTune_DataLoader(Dataset):
             imgLocation, ID = data
             if valid:
                 self.filteredImages.append((imgLocation, ID))
-                if imgLocation not in self.convexPolytopePoison: TP = TP + 1
-                else: FP = FP + 1
+                if imgLocation not in self.convexPolytopePoison:
+                    TP = TP + 1
+                else:
+                    FP = FP + 1
             else:
-                if imgLocation in self.convexPolytopePoison: TN = TN + 1
-                else: FN = FN + 1
+                if imgLocation in self.convexPolytopePoison:
+                    TN = TN + 1
+                else:
+                    FN = FN + 1
 
-        precision = TP / (TP + FP)
-        recall = TP / (TP + FN)
-        F1 = 2 * (precision * recall) / (precision + recall)
+        precision = TP / float(TP + FP)
+        recall = TP / float(TP + FN)
+        F1 = 2 * (precision * recall) / float(precision + recall)
 
         print("True Positive: " + str(TP) + " | " + "True Negative: " + str(TN) + " | " + "False Positive: " + str(FP) + " | " + "False Negative: " + str(FN))
         print("Precision: " + str(precision) + " | " + "Recall: " + str(recall) + " | " + "F1: " + str(F1))

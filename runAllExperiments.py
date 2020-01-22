@@ -1,35 +1,22 @@
 import os
-import Utilities
 import argparse
+import random
+
+import Utilities
 import pdb
 
-
-parser = argparse.ArgumentParser()
-parser.add_argument("--restartExperiments", default=True, action="store_false")
-args = parser.parse_args()
-
-resumeExperiments = args.restartExperiments
 architecture = ["DenseNet121", "DPN92", "GoogLeNet", "MobileNetV2", "ResNet18", "ResNet50", "ResNeXt29_2x64d", "SENet18"]
 replicateImbalance = [True, False]
 classBalance = ["5", "10", "25", "50"]
 KValues = ["1", "2", "5", "10", "20", "50", "100", "200"]
 
-logFileLocation = "/fs/diva-scratch/peri/CleanLabelPoisons/kNN_Class_Imbalance/classImbalance_ConvexPolytopePoison_kNNDefense.txt"
-completedExperimentsLocation = "/fs/diva-scratch/peri/CleanLabelPoisons/kNN_Class_Imbalance/completedExperiments.txt"
-poisonIndexDirectory = "/fs/diva-scratch/peri/CleanLabelPoisons/kNN_Class_Imbalance/CIFAR10/PoisonIndex/"
+random.shuffle(architecture)
+random.shuffle(replicateImbalance)
+random.shuffle(classBalance)
+random.shuffle(KValues)
 
-completedExperiments = set()
-if not resumeExperiments:
-    Utilities.clearLog(logFileLocation)
-    Utilities.clearLog(completedExperimentsLocation)
-
-    Utilities.writeLog(logFileLocation, "Experiment Parameters")
-    Utilities.writeLog(logFileLocation, "Architecture: " + str(architecture))
-    Utilities.writeLog(logFileLocation, "Replicate Imbalance: " + str(replicateImbalance))
-    Utilities.writeLog(logFileLocation, "Class Balance: " + str(classBalance))
-    Utilities.writeLog(logFileLocation, "K Values: " + str(KValues))
-else:
-    completedExperiments = Utilities.loadExperimentCheckPoint(completedExperimentsLocation)
+logFileDirectory = "./Logs/"
+poisonIndexDirectory = "./CIFAR10/PoisonIndex/"
 
 for modelName in architecture:
     allPoisonIndex = Utilities.parsePoisonIndex(poisonIndexDirectory + modelName + "_PoisonIndex.txt")
@@ -37,13 +24,8 @@ for modelName in architecture:
         for K in KValues:
             for poisonIndex in allPoisonIndex:
                 for replicate in replicateImbalance:
-                    experimentDetails = modelName + ", " + str(targetWeight) + ", " + str(K) + ", " + str(poisonIndex) + ", " + str(replicate)
-                    if experimentDetails not in completedExperiments:
+                    experimentDetails = modelName + "_" + str(targetWeight) + "_" + str(K) + "_" + str(poisonIndex) + "_" + str(replicate) + ".txt"
 
-                        if replicate:
-                            os.system("python trainPoison.py --logFileLocation /fs/diva-scratch/peri/CleanLabelPoisons/kNN_Class_Imbalance/classImbalance_ConvexPolytopePoison_kNNDefense.txt --checkPointDirectory /fs/diva-scratch/peri/CleanLabelPoisons/kNN_Class_Imbalance/modelCheckPoints/ --dataSplitDirectory /fs/diva-scratch/peri/CleanLabelPoisons/kNN_Class_Imbalance/CIFAR10/DataSplit/ --poisonIndex {0} --poisonImageDirectory /fs/diva-scratch/peri/CleanLabelPoisons/kNN_Class_Imbalance/CIFAR10/ConvexPolytopePoisons/ --featureDirectory /fs/diva-scratch/peri/CleanLabelPoisons/kNN_Class_Imbalance/CIFAR10/Features/ --architecture {1} --replicateImbalance --classBalance 50 50 50 50 50 50 {2} 50 50 50  --K {3}".format(poisonIndex, modelName, targetWeight, K))
-                        else:
-                            os.system("python trainPoison.py --logFileLocation /fs/diva-scratch/peri/CleanLabelPoisons/kNN_Class_Imbalance/classImbalance_ConvexPolytopePoison_kNNDefense.txt --checkPointDirectory /fs/diva-scratch/peri/CleanLabelPoisons/kNN_Class_Imbalance/modelCheckPoints/ --dataSplitDirectory /fs/diva-scratch/peri/CleanLabelPoisons/kNN_Class_Imbalance/CIFAR10/DataSplit/ --poisonIndex {0} --poisonImageDirectory /fs/diva-scratch/peri/CleanLabelPoisons/kNN_Class_Imbalance/CIFAR10/ConvexPolytopePoisons/ --featureDirectory /fs/diva-scratch/peri/CleanLabelPoisons/kNN_Class_Imbalance/CIFAR10/Features/ --architecture {1} --classBalance 50 50 50 50 50 50 {2} 50 50 50  --K {3}".format(poisonIndex, modelName, targetWeight, K))
-
-                        completedExperiments.add(experimentDetails)
-                        Utilities.writeLog(completedExperimentsLocation, experimentDetails)
+                    if experimentDetails not in os.listdir(logFileDirectory):
+                        if replicate: os.system("python trainPoison.py --logFileLocation {0} --checkPointDirectory ./modelCheckPoints/ --dataSplitDirectory ./CIFAR10/DataSplit/ --poisonIndex {1} --poisonImageDirectory ./CIFAR10/ConvexPolytopePoisons/ --featureDirectory ./CIFAR10/Features/ --architecture {2} --replicateImbalance --classBalance 50 50 50 50 50 50 {3} 50 50 50  --K {4}".format(logFileDirectory + experimentDetails, poisonIndex, modelName, targetWeight, K))
+                        else: os.system("python trainPoison.py --logFileLocation {0} --checkPointDirectory ./modelCheckPoints/ --dataSplitDirectory ./CIFAR10/DataSplit/ --poisonIndex {1} --poisonImageDirectory ./CIFAR10/ConvexPolytopePoisons/ --featureDirectory ./CIFAR10/Features/ --architecture {2} --classBalance 50 50 50 50 50 50 {3} 50 50 50  --K {4}".format(logFileDirectory + experimentDetails, poisonIndex, modelName, targetWeight, K))

@@ -50,13 +50,11 @@ def train(args):
     dataAugmentation = transforms.Compose([transforms.Resize((IMGSIZE, IMGSIZE)), transforms.ToTensor(), normalize])
 
     try:
-        Utilities.newExperiment(args.logFileLocation)
         Utilities.writeLog(args.logFileLocation, "Model Architecture: " + str(modelName))
         Utilities.writeLog(args.logFileLocation, "Poison Index: " + str(poisonIndex))
         Utilities.writeLog(args.logFileLocation, "K Value: " + str(args.K))
         Utilities.writeLog(args.logFileLocation, "classBalance: " + str(args.classBalance))
         Utilities.writeLog(args.logFileLocation, "Replicate Imbalance: " + str(args.replicateImbalance))
-
 
         print("Poison Index: " + str(poisonIndex))
         TrainDataset = dataLoader.ConvexPolytopeFineTune_DataLoader(args, poisonIndex, dataAugmentation)
@@ -128,7 +126,7 @@ def train(args):
 
     except Exception as e:
         print("Status: " + str(e))
-        Utilities.writeLog("Status: " + str(e))
+        Utilities.writeLog(args.logFileLocation, "Status: " + str(e))
 
     print("\n")
 
