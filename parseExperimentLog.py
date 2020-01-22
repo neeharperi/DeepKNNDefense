@@ -3,8 +3,8 @@ import pandas as pd
 from tqdm import tqdm
 import pdb
 
-logFileLocation = "classImbalance_ConvexPolytopePoison_kNNDefense.txt"
-saveExcel = "classImbalance_ExperimentSummary.xlsx"
+logFileLocation = "/fs/diva-scratch/peri/CleanLabelPoisons/kNN_Class_Imbalance/classImbalance_ConvexPolytopePoison_kNNDefense.txt"
+saveExcel = "/fs/diva-scratch/peri/CleanLabelPoisons/kNN_Class_Imbalance/classImbalance_ExperimentSummary.xlsx"
 logFile = open(logFileLocation).read()
 experiments = logFile.split("\n\n\n")[1:]
 
@@ -86,4 +86,4 @@ for experiment in tqdm(experiments):
     for key in data.keys():
         dataFrame[key].append(data[key])
 
-pd.DataFrame.from_dict(dataFrame).to_csv(saveExcel)
+pd.DataFrame.from_dict(dataFrame).to_csv(saveExcel, index=False)

@@ -9,6 +9,17 @@ from tqdm import tqdm
 
 import pdb
 
+
+
+def loadExperimentCheckPoint(logFile):
+    file = open(logFile)
+    completedExperiments = set()
+
+    for line in file:
+        completedExperiments.add(line.strip("\n"))
+
+    return completedExperiments
+
 def writeLog(logFile, line):
     log = open(logFile, "a")
     log.write(line + "\n")

@@ -18,7 +18,7 @@ BATCHSIZE = 512
 WORKERS = 8
 IMGSIZE = 32
 
-checkPointDirectory = "./modelCheckPoints"
+checkPointDirectory = "/fs/diva-scratch/peri/CleanLabelPoisons/kNN_Class_Imbalance/modelCheckPoints"
 normalize = transforms.Normalize(mean=[0.4914, 0.4822, 0.4465], std=[0.2023, 0.1994, 0.2010])
 validationAugmentation = transforms.Compose([transforms.Resize((IMGSIZE, IMGSIZE)), transforms.ToTensor(), normalize])
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
@@ -52,8 +52,8 @@ for modelName in architecture:
     model.load_state_dict(CheckPoint["net"])
     model.to(device)
 
-    files = ["./CIFAR10/DataSplit/trainFile.txt", "./CIFAR10/DataSplit/testFile.txt",
-             "./CIFAR10/DataSplit/fineTuneFile.txt", "./CIFAR10/DataSplit/" + modelName + "_Poison.txt"]
+    files = ["/fs/diva-scratch/peri/CleanLabelPoisons/kNN_Class_Imbalance/CIFAR10/DataSplit/trainFile.txt", "/fs/diva-scratch/peri/CleanLabelPoisons/kNN_Class_Imbalance/CIFAR10/DataSplit/testFile.txt",
+             "/fs/diva-scratch/peri/CleanLabelPoisons/kNN_Class_Imbalance/CIFAR10/DataSplit/fineTuneFile.txt", "/fs/diva-scratch/peri/CleanLabelPoisons/kNN_Class_Imbalance/CIFAR10/DataSplit/" + modelName + "_Poison.txt"]
 
     extractedFeatures = {}
     for testFile in files:
@@ -67,7 +67,7 @@ for modelName in architecture:
             extractedFeatures[IL] = FV
 
 
-    torch.save(extractedFeatures, "./CIFAR10/Features/" + modelName + "_CIFAR10_Features.pth")
+    torch.save(extractedFeatures, "/fs/diva-scratch/peri/CleanLabelPoisons/kNN_Class_Imbalance/CIFAR10/Features/" + modelName + "_CIFAR10_Features.pth")
 
 
 
