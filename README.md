@@ -15,6 +15,8 @@ The KNN defense is implemented directly in the dataloader. To test the performan
 python runAllExperiments.py
 ```
 
+If you have sufficient hardware, you can run multiple instances of runAllExperiments.py to speed up evaluation on the parameter sweep.
+
 ## Export Log to Excel
 After running all experiments, export the results into an excel file by executing:
 
