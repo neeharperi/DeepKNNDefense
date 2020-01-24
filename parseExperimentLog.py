@@ -48,4 +48,4 @@ for modelName in architecture:
                     else:
                         print("File Does Not Exist: " + logFileDirectory + experimentName)
 
-pd.DataFrame.from_dict(dataFrame).to_csv(saveExcel, index=False)
+pd.DataFrame.from_dict(dataFrame).to_excel(saveExcel, index=False)
