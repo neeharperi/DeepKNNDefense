@@ -28,6 +28,7 @@ dataFrame = {"Model Architecture" : [],
              "F1" : [],
              "Train Accuracy" : [],
              "Test Accuracy" : [],
+             "Poisoning Successful on Target Image" : [],
              "Status" : []}
 
 for modelName in architecture:

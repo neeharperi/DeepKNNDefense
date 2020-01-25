@@ -4,6 +4,8 @@ import pdb
 trainDirectory = "./CIFAR10/TrainSplit"
 trainFile = open("./CIFAR10/DataSplit/trainFile.txt", "w")
 fineTuneFile = open("./CIFAR10/DataSplit/fineTuneFile.txt", "w")
+targetImageFile = open("./CIFAR10/DataSplit/targetImageFile.txt", "w")
+targetClass = "6"
 
 testDirectory = "./CIFAR10/TestSplit"
 testFile = open("./CIFAR10/DataSplit/testFile.txt", "w")
@@ -19,6 +21,10 @@ for ID in os.listdir(trainDirectory):
     for img in fineTune:
         fineTuneFile.write(trainDirectory + "/" + ID + "/" + str(img) + ".png" + " " + ID + "\n")
 
+    if ID == targetClass:
+        target = imgList[4850:4900]
+        for i, img in enumerate(target):
+            targetImageFile.write(trainDirectory + "/" + ID + "/" + str(img) + ".png" + " " + str(i) + "\n")
 
 for ID in os.listdir(testDirectory):
     for img in os.listdir(testDirectory + "/" + ID):

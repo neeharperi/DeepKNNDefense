@@ -27,5 +27,7 @@ for modelName in architecture:
                     experimentDetails = modelName + "_" + str(targetWeight) + "_" + str(K) + "_" + str(poisonIndex) + "_" + str(replicate) + ".txt"
 
                     if experimentDetails not in os.listdir(logFileDirectory):
+                        Utilities.clearLog(logFileDirectory + experimentDetails)
+
                         if replicate: os.system("python trainPoison.py --logFileLocation {0} --checkPointDirectory ./modelCheckPoints/ --dataSplitDirectory ./CIFAR10/DataSplit/ --poisonIndex {1} --poisonImageDirectory ./CIFAR10/ConvexPolytopePoisons/ --featureDirectory ./CIFAR10/Features/ --architecture {2} --replicateImbalance --classBalance 50 50 50 50 50 50 {3} 50 50 50  --K {4}".format(logFileDirectory + experimentDetails, poisonIndex, modelName, targetWeight, K))
                         else: os.system("python trainPoison.py --logFileLocation {0} --checkPointDirectory ./modelCheckPoints/ --dataSplitDirectory ./CIFAR10/DataSplit/ --poisonIndex {1} --poisonImageDirectory ./CIFAR10/ConvexPolytopePoisons/ --featureDirectory ./CIFAR10/Features/ --architecture {2} --classBalance 50 50 50 50 50 50 {3} 50 50 50  --K {4}".format(logFileDirectory + experimentDetails, poisonIndex, modelName, targetWeight, K))

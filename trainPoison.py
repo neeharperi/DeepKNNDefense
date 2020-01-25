@@ -13,12 +13,13 @@ import torchvision.transforms as transforms
 import torchvision.utils
 from torch.utils.data import DataLoader
 from tqdm import tqdm
+from PIL import Image
 
 from Models import *
 import dataLoader
 import Utilities
 
-def evaluateModel(args, model, device, trainData, validationData):
+def evaluateModel(args, model, device, trainData, validationData, target, targetClass):
     trainAccuracy = Utilities.classificationAccuracy(model, device, trainData)
     print("Train Accuracy: " + str(trainAccuracy))
     Utilities.writeLog(args.logFileLocation, "Train Accuracy: " + str(trainAccuracy))
@@ -26,6 +27,10 @@ def evaluateModel(args, model, device, trainData, validationData):
     testAccuracy = Utilities.classificationAccuracy(model, device, validationData)
     print("Test Accuracy: " + str(testAccuracy))
     Utilities.writeLog(args.logFileLocation, "Test Accuracy: " + str(testAccuracy))
+
+    targetSuccess = Utilities.testTarget(model, device, target, targetClass)
+    print("Poisoning Successful on Target Image: " + str(targetSuccess))
+    Utilities.writeLog(args.logFileLocation, "Poisoning Successful on Target Image: " + str(targetSuccess))
 
 def train(args):
     modelName = args.architecture
@@ -38,8 +43,8 @@ def train(args):
     WORKERS = args.workers
     LR = args.learningRate
     WEIGHTDECAY = args.weightDecay
-
     IMGSIZE = args.imageSize
+    targetClass = 8 #Ships
 
     print("Using Parameters:")
     pprint(vars(args))
@@ -119,7 +124,9 @@ def train(args):
 
             print("Epoch: " + str(STEP + 1) + " of " + str(EPOCH) + " | " + "Epoch Loss: " + str(epochLoss / batchCount))
 
-        evaluateModel(args, model, device, trainData, validationData)
+        targetFile = Utilities.parseTargetIndex(dataSplitDirectory + "targetImageFile.txt", poisonIndex)
+        target = dataAugmentation(Image.open(targetFile))
+        evaluateModel(args, model, device, trainData, validationData, target, targetClass)
 
         print("Status: Experiment Completed Successfully")
         Utilities.writeLog(args.logFileLocation, "Status: Experiment Completed Successfully")
