@@ -23,3 +23,9 @@ After running all experiments, export the results into an excel file by executin
 ```bash
 python parseExperimentLog.py
 ```
+
+## Generate Figures
+Create plots showing summary statistics comparing the effect of different K values and class balance strategies on several metrics by running
+```bash
+python generateFigures.py
+```

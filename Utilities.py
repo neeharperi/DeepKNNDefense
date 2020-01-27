@@ -21,13 +21,22 @@ def parseLogFile(logFile):
             "True Negative" : None,
             "False Positive" : None,
             "False Negative" : None,
+            "True Positive Rate" : None,
+            "True Negative Rate" : None,
+            "False Positive Rate" : None,
+            "False Negative Rate" : None,
+            "Negative Predictive Value" : None,
+            "False Discovery Rate" : None,
+            "False Omission Rate" : None,
+            "Critical Success Index" : None,
+            "Matthews Correlation Coefficient" : None,
             "Precision" : None,
             "Recall" : None,
             "F1" : None,
             "Train Accuracy" : None,
             "Test Accuracy" : None,
             "Poisoning Successful on Target Image" : None,
-                "Status" : None}
+            "Status" : None}
 
     for item in log:
         item = item.strip("\n")
@@ -70,6 +79,34 @@ def parseLogFile(logFile):
 
         elif "Status" in item:
             data["Status"] = item.replace("Status: ", "")
+
+
+    try: data["True Positive Rate"] = data["True Positive"] / float(data["True Positive"] + data["False Negative"])
+    except: data["True Positive Rate"] = None
+
+    try: data["True Negative Rate"] = data["True Negative"] / float(data["True Negative"] + data["False Positive"])
+    except: data["True Negative Rate"] = None
+
+    try: data["False Positive Rate"] = 1 - data["True Negative Rate"]
+    except: data["False Positive Rate"] = None
+
+    try: data["False Negative Rate"] = 1 - data["True Positive Rate"]
+    except: data["False Negative Rate"] = None
+
+    try: data["Negative Predictive Value"] = data["True Negative"] / float(data["True Negative"] + data["False Negative"])
+    except: data["Negative Predictive Value"] = None
+
+    try: data["False Discovery Rate"] = 1 - data["Precision"]
+    except: data["False Discovery Rate"] = None
+
+    try: data["False Omission Rate"] = 1 - data["Negative Predictive Value"]
+    except: data["False Omission Rate"] = None
+
+    try: data["Critical Success Index"] = data["True Positive"] / float(data["True Positive"] + data["False Negative"] + data["False Positive"])
+    except: data["Critical Success Index"] = None
+
+    try: data["Matthews Correlation Coefficient"] = ((data["True Positive"] * data["True Negative"]) - (data["False Positive"] * data["False Negative"])) / np.sqrt((data["True Positive"] + data["False Positive"]) * (data["True Positive"] + data["False Negative"]) * (data["True Negative"] + data["False Positive"]) * (data["True Negative"] + data["False Negative"]))
+    except: data["Matthews Correlation Coefficient"] = None
 
     return data
 
