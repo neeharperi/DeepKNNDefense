@@ -29,8 +29,8 @@ def evaluateModel(args, model, device, trainData, validationData, target, target
     Utilities.writeLog(args.logFileLocation, "Test Accuracy: " + str(testAccuracy))
 
     targetSuccess = Utilities.testTarget(model, device, target, targetClass)
-    print("Poisoning Successful on Target Image: " + str(targetSuccess))
-    Utilities.writeLog(args.logFileLocation, "Poisoning Successful on Target Image: " + str(targetSuccess))
+    print("Poison Success on Target Image: " + str(targetSuccess))
+    Utilities.writeLog(args.logFileLocation, "Poison Success on Target Image: " + str(targetSuccess))
 
 def train(args):
     modelName = args.architecture

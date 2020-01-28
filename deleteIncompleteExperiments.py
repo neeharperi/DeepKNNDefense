@@ -7,6 +7,6 @@ logFileDirectory = "./Logs/"
 for logFile in os.listdir(logFileDirectory):
     data = Utilities.parseLogFile(logFileDirectory + logFile)
 
-    if None in data.values():
+    if data["Status"] is None:
         os.remove(logFileDirectory + logFile)
         print("Removed " + logFileDirectory + logFile)

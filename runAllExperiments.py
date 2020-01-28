@@ -8,7 +8,7 @@ import pdb
 architecture = ["DenseNet121", "DPN92", "GoogLeNet", "MobileNetV2", "ResNet18", "ResNet50", "ResNeXt29_2x64d", "SENet18"]
 replicateImbalance = [True, False]
 classBalance = ["5", "10", "25", "50"]
-KValues = ["1", "2", "5", "10", "20", "50", "100", "200"]
+KValues = ["2", "5", "10", "20", "50", "75", "90", "100", "110", "125", "200", "400"]
 
 random.shuffle(architecture)
 random.shuffle(replicateImbalance)

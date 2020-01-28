@@ -102,15 +102,14 @@ class ConvexPolytopeFineTune_DataLoader(Dataset):
                 else:
                     FN = FN + 1
 
-        precision = TP / float(TP + FP)
-        recall = TP / float(TP + FN)
-        F1 = 2 * (precision * recall) / float(precision + recall)
+        try: MCC = ((TP * TN) - (FP * FN)) / np.sqrt((TP + FP) * (TP + FN) * (TN + FP) * (TN + FN))
+        except: MCC = None
 
         print("True Positive: " + str(TP) + " | " + "True Negative: " + str(TN) + " | " + "False Positive: " + str(FP) + " | " + "False Negative: " + str(FN))
-        print("Precision: " + str(precision) + " | " + "Recall: " + str(recall) + " | " + "F1: " + str(F1))
+        print("Matthews Correlation Coefficient: " + str(MCC))
 
         Utilities.writeLog(args.logFileLocation, "True Positive: " + str(TP) + " | " + "True Negative: " + str(TN) + " | " + "False Positive: " + str(FP) + " | " + "False Negative: " + str(FN))
-        Utilities.writeLog(args.logFileLocation, "Precision: " + str(precision) + " | " + "Recall: " + str(recall) + " | " + "F1: " + str(F1))
+        Utilities.writeLog(args.logFileLocation, "Matthews Correlation Coefficient: " + str(MCC))
 
     def __len__(self):
         return len(self.filteredImages)

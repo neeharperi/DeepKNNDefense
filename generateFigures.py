@@ -15,7 +15,7 @@ if not os.path.isdir(figureDirectory):
 architecture = ["DenseNet121", "DPN92", "GoogLeNet", "MobileNetV2", "ResNet18", "ResNet50", "ResNeXt29_2x64d", "SENet18"]
 replicateImbalance = [True, False]
 classBalance = [5, 10, 25, 50]
-KValues = [1, 2, 5, 10, 20, 50, 100, 200]
+KValues = [2, 5, 10, 20, 50, 75, 90, 100, 110, 125, 200, 400]
 
 fixedClassBalance = 50
 fixedK = 100
@@ -26,212 +26,132 @@ for rowTable in dataFrame.iterrows():
     dataFrame.at[rowTable[0], "Class Balance"] = int(targetWeight)
 
 #Q1: (Fixed Class Balance) Is the effectiveness of KNN Defense Model Specific?
-Q1_dataFrame = dataFrame[(dataFrame["Class Balance"] == fixedClassBalance)][["Model Architecture", "K Value", "Poisoning Successful on Target Image"]]
+Q1_dataFrame = dataFrame[(dataFrame["Class Balance"] == fixedClassBalance)][["Model Architecture", "K Value", "Poison Success on Target Image"]]
 Q1_Statistics = {"Model Architecture" : [],
-                 "K Value" : [],
-                 "KNN Defense Success" : []}
+                 "P Value" : [],
+                 "Attack Success Rate" : []}
 
 for modelName in architecture:
     for K in KValues:
         Q1_Statistics["Model Architecture"].append(modelName)
-        Q1_Statistics["K Value"].append(K)
+        Q1_Statistics["P Value"].append((K / fixedClassBalance))
         tempDataFrame = Q1_dataFrame[(Q1_dataFrame["Model Architecture"] == modelName) & (Q1_dataFrame["K Value"] == K)]
-        Q1_Statistics["KNN Defense Success"].append(np.sum(tempDataFrame["Poisoning Successful on Target Image"] == False) / float(tempDataFrame.shape[0]))
+        Q1_Statistics["Attack Success Rate"].append(np.sum(tempDataFrame["Poison Success on Target Image"] == True) / float(tempDataFrame.shape[0]))
 
 Q1_Plot = pd.DataFrame.from_dict(Q1_Statistics)
-ax = sns.swarmplot(x="K Value", y="KNN Defense Success", hue="Model Architecture", data=Q1_Plot)
-plt.title("Is the Effectiveness of kNN Defense Model Agnostic? (Class Balance = {})".format(fixedClassBalance))
+ax = sns.pointplot(x="P Value", y="Attack Success Rate", hue="Model Architecture", data=Q1_Plot)
+plt.title("Transfer Convex Polytope Attack Success (Class Balance = {})".format(fixedClassBalance))
 plt.savefig(figureDirectory + "fixedClassBalance_ModelAgnostic.png")
 plt.clf()
 
-#Q2: (Fixed Class Balance) Precision of All Models?
-Q2_dataFrame = dataFrame[(dataFrame["Class Balance"] == fixedClassBalance)][["K Value", "Model Architecture", "Precision"]]
-ax = sns.pointplot(x="K Value", y="Precision", hue="Model Architecture", ci=None, data=Q2_dataFrame)
-
-plt.title("Precision of All Models (Class Balance = {})".format(fixedClassBalance))
-plt.savefig(figureDirectory + "fixedClassBalance_Precision.png")
-plt.clf()
-
-#Q3: (Fixed Class Balance) Recall of All Models?
-Q3_dataFrame = dataFrame[(dataFrame["Class Balance"] == fixedClassBalance)][["K Value", "Model Architecture", "Recall"]]
-ax = sns.pointplot(x="K Value", y="Recall", hue="Model Architecture", ci=None, data=Q3_dataFrame)
-
-plt.title("Recall of All Models (Class Balance = {})".format(fixedClassBalance))
-plt.savefig(figureDirectory + "fixedClassBalance_Recall.png")
-plt.clf()
-
-#Q4: (Fixed Class Balance) F1 of All Models?
-Q4_dataFrame = dataFrame[(dataFrame["Class Balance"] == fixedClassBalance)][["K Value", "Model Architecture", "F1"]]
-ax = sns.pointplot(x="K Value", y="F1", hue="Model Architecture", ci=None, data=Q4_dataFrame)
-
-plt.title("F1 of All Models (Class Balance = {})".format(fixedClassBalance))
-plt.savefig(figureDirectory + "fixedClassBalance_F1.png")
-plt.clf()
-
-#Q5: (Fixed Class Balance) Specificity of All Models?
-Q5_dataFrame = dataFrame[(dataFrame["Class Balance"] == fixedClassBalance)][["K Value", "Model Architecture", "True Negative Rate"]]
-ax = sns.pointplot(x="K Value", y="True Negative Rate", hue="Model Architecture", ci=None, data=Q5_dataFrame)
-
-plt.title("Specificity of All Models (Class Balance = {})".format(fixedClassBalance))
-plt.savefig(figureDirectory + "fixedClassBalance_Specificity.png")
-plt.clf()
-
-#Q6: (Fixed Class Balance) Negative Predictive Value of All Models?
-Q6_dataFrame = dataFrame[(dataFrame["Class Balance"] == fixedClassBalance)][["K Value", "Model Architecture", "Negative Predictive Value"]]
-ax = sns.pointplot(x="K Value", y="Negative Predictive Value", hue="Model Architecture", ci=None, data=Q6_dataFrame)
-
-plt.title("Negative Predictive Value of All Models (Class Balance = {})".format(fixedClassBalance))
-plt.savefig(figureDirectory + "fixedClassBalance_NegativePredictionValue.png")
-plt.clf()
-
-#Q7: (Fixed Class Balance) False Discovery Rate of All Models?
-Q7_dataFrame = dataFrame[(dataFrame["Class Balance"] == fixedClassBalance)][["K Value", "Model Architecture", "False Discovery Rate"]]
-ax = sns.pointplot(x="K Value", y="False Discovery Rate", hue="Model Architecture", ci=None, data=Q7_dataFrame)
-
-plt.title("False Discovery Rate of All Models (Class Balance = {})".format(fixedClassBalance))
-plt.savefig(figureDirectory + "fixedClassBalance_FalseDiscoveryRate.png")
-plt.clf()
-
-#Q8: (Fixed Class Balance) False Omission Rate of All Models?
-Q8_dataFrame = dataFrame[(dataFrame["Class Balance"] == fixedClassBalance)][["K Value", "Model Architecture", "False Omission Rate"]]
-ax = sns.pointplot(x="K Value", y="False Omission Rate", hue="Model Architecture", ci=None, data=Q8_dataFrame)
-
-plt.title("False Omission Rate of All Models (Class Balance = {})".format(fixedClassBalance))
-plt.savefig(figureDirectory + "fixedClassBalance_FalseOmissionRate.png")
-plt.clf()
-
-#Q9: (Fixed Class Balance) Critical Success Index of All Models?
-Q9_dataFrame = dataFrame[(dataFrame["Class Balance"] == fixedClassBalance)][["K Value", "Model Architecture", "Critical Success Index"]]
-ax = sns.pointplot(x="K Value", y="Critical Success Index", hue="Model Architecture", ci=None, data=Q9_dataFrame)
-
-plt.title("Critical Success Index of All Models (Class Balance = {})".format(fixedClassBalance))
-plt.savefig(figureDirectory + "fixedClassBalance_CriticalSuccessIndex.png")
-plt.clf()
-
-#Q10: (Fixed Class Balance) Matthews Correlation Coefficient of All Models?
-Q10_dataFrame = dataFrame[(dataFrame["Class Balance"] == fixedClassBalance)][["K Value", "Model Architecture", "Matthews Correlation Coefficient"]]
-ax = sns.pointplot(x="K Value", y="Matthews Correlation Coefficient", hue="Model Architecture", ci=None, data=Q10_dataFrame)
-
-plt.title("Matthews Correlation Coefficient of All Models (Class Balance = {})".format(fixedClassBalance))
-plt.savefig(figureDirectory + "fixedClassBalance_CorrelationCoefficient.png")
-plt.clf()
-
-#Q11: (Fixed Class Balance) ROC of All Models
-Q11_dataFrame = dataFrame[(dataFrame["Class Balance"] == fixedClassBalance)][["Model Architecture", "K Value", "True Positive Rate", "False Positive Rate"]]
-Q11_Statistics = {"Model Architecture" : [],
-                 "K Value" : [],
-                 "True Positive Rate" : [],
-                 "False Positive Rate" : []}
+#Q2: (Fixed Class Balance) Matthews Correlation Coefficient of All Models?
+Q2_dataFrame = dataFrame[(dataFrame["Class Balance"] == fixedClassBalance)][["K Value", "Model Architecture", "Matthews Correlation Coefficient"]]
+Q2_Statistics = {"Model Architecture" : [],
+                 "P Value" : [],
+                 "Matthews Correlation Coefficient" : []}
 
 for modelName in architecture:
     for K in KValues:
-        Q11_Statistics["Model Architecture"].append(modelName)
-        Q11_Statistics["K Value"].append(K)
-        tempDataFrame = Q11_dataFrame[(Q11_dataFrame["Model Architecture"] == modelName) & (Q11_dataFrame["K Value"] == K)]
-        Q11_Statistics["True Positive Rate"].append(np.mean(tempDataFrame["True Positive Rate"]))
-        Q11_Statistics["False Positive Rate"].append(np.mean(tempDataFrame["False Positive Rate"]))
+        Q2_Statistics["Model Architecture"].append(modelName)
+        Q2_Statistics["P Value"].append((K / fixedClassBalance))
+        tempDataFrame = Q2_dataFrame[(Q2_dataFrame["Model Architecture"] == modelName) & (Q2_dataFrame["K Value"] == K)]
+        Q2_Statistics["Matthews Correlation Coefficient"].append(np.mean(tempDataFrame["Matthews Correlation Coefficient"]))
 
-Q11_Plot = pd.DataFrame.from_dict(Q11_Statistics)
-ax = sns.lineplot(x="False Positive Rate", y="True Positive Rate", hue="Model Architecture", data=Q11_Plot)
-plt.title("ROC of All Models (Class Balance = {})".format(fixedClassBalance))
-plt.savefig(figureDirectory + "fixedClassBalance_ROC.png")
+
+Q2_Plot = pd.DataFrame(Q2_Statistics)
+ax = sns.pointplot(x="P Value", y="Matthews Correlation Coefficient", hue="Model Architecture", ci=None, data=Q2_Plot)
+ax.get_legend().set_visible(False)
+plt.title("Deep-KNN Poison Filtering Success (Class Balance = {})".format(fixedClassBalance))
+plt.savefig(figureDirectory + "fixedClassBalance_CorrelationCoefficient.png")
 plt.clf()
 
+#Q3: (Fixed Class Balance) Test Accuracy of All Models?
+Q3_dataFrame = dataFrame[(dataFrame["Class Balance"] == fixedClassBalance)][["K Value", "Model Architecture", "Test Accuracy"]]
+Q3_Statistics = {"Model Architecture" : [],
+                 "P Value" : [],
+                 "Test Accuracy" : []}
 
-#Q12: (Fixed K) Is the effectiveness of KNN Defense Model Specific?
-Q12_dataFrame = dataFrame[(dataFrame["K Value"] == fixedK)][["Model Architecture", "Class Balance", "Replicate Imbalance", "Poisoning Successful on Target Image"]]
-Q12_Statistics = {"Model Architecture" : [],
-                 "Class Balance" : [],
+for modelName in architecture:
+    for K in KValues:
+        Q3_Statistics["Model Architecture"].append(modelName)
+        Q3_Statistics["P Value"].append((K / fixedClassBalance))
+        tempDataFrame = Q3_dataFrame[(Q3_dataFrame["Model Architecture"] == modelName) & (Q3_dataFrame["K Value"] == K)]
+        Q3_Statistics["Test Accuracy"].append(np.mean(tempDataFrame["Test Accuracy"]))
+
+Q3_Plot = pd.DataFrame(Q3_Statistics)
+ax = sns.pointplot(x="P Value", y="Test Accuracy", hue="Model Architecture", ci=None, data=Q3_Plot)
+ax.get_legend().set_visible(False)
+plt.title("Deep-KNN Test Accuracy (Class Balance = {})".format(fixedClassBalance))
+plt.savefig(figureDirectory + "fixedClassBalance_TestAccuracy.png")
+plt.clf()
+
+#Q4: (Fixed K) Is the effectiveness of KNN Defense Model Specific?
+Q4_dataFrame = dataFrame[(dataFrame["K Value"] == fixedK)][["Model Architecture", "Class Balance", "Replicate Imbalance", "Poison Success on Target Image"]]
+Q4_Statistics = {"Model Architecture" : [],
+                 "Class Balance Ratio" : [],
                  "Replicate Imbalance" : [],
-                 "KNN Defense Success" : []}
+                 "Attack Success Rate" : []}
 
 for modelName in architecture:
     for targetWeight in classBalance:
         for replicate in replicateImbalance:
-            Q12_Statistics["Model Architecture"].append(modelName)
-            Q12_Statistics["Class Balance"].append(targetWeight)
-            Q12_Statistics["Replicate Imbalance"].append(replicate)
-            tempDataFrame = Q12_dataFrame[(Q12_dataFrame["Model Architecture"] == modelName) & (Q12_dataFrame["Replicate Imbalance"] == replicate) & (Q12_dataFrame["Class Balance"] == targetWeight)]
-            Q12_Statistics["KNN Defense Success"].append(np.sum(tempDataFrame["Poisoning Successful on Target Image"] == False) / float(tempDataFrame.shape[0]))
+            Q4_Statistics["Model Architecture"].append(modelName)
+            Q4_Statistics["Class Balance Ratio"].append(targetWeight / fixedClassBalance)
+            Q4_Statistics["Replicate Imbalance"].append(replicate)
+            tempDataFrame = Q4_dataFrame[(Q4_dataFrame["Model Architecture"] == modelName) & (Q4_dataFrame["Replicate Imbalance"] == replicate) & (Q4_dataFrame["Class Balance"] == targetWeight)]
+            Q4_Statistics["Attack Success Rate"].append(np.sum(tempDataFrame["Poison Success on Target Image"] == True) / float(tempDataFrame.shape[0]))
 
-Q12_Plot = pd.DataFrame.from_dict(Q12_Statistics)
-ax = sns.catplot(x="Class Balance", y="KNN Defense Success", hue="Model Architecture",  data=Q12_Plot, col="Replicate Imbalance", order=[5, 10, 25, 50], kind="swarm")
+Q4_Plot = pd.DataFrame.from_dict(Q4_Statistics)
+ax = sns.catplot(x="Class Balance Ratio", y="Attack Success Rate", hue="Model Architecture",  data=Q4_Plot, col="Replicate Imbalance", order=[i / fixedClassBalance for i in classBalance] , kind="point")
 plt.subplots_adjust(top=0.9)
-ax.fig.suptitle("Is the Effectiveness of KNN Defense Model Agnostic? (K Value = {})".format(fixedK))
+ax.fig.suptitle("Transfer Convex Polytope Attack Success (K Value = {})".format(fixedK))
 plt.savefig(figureDirectory + "fixedK_modelAgnostic.png")
 
-#Q13: (Fixed K) Precision of All Models?
-Q13_dataFrame = dataFrame[(dataFrame["K Value"] == fixedK)][["Class Balance", "Replicate Imbalance", "Model Architecture", "Precision"]]
-ax = sns.catplot(x="Class Balance", y="Precision", hue="Model Architecture",  data=Q13_dataFrame, col="Replicate Imbalance", order=[5, 10, 25, 50], kind="point", ci=None)
+
+#Q5: (Fixed K) Matthews Correlation Coefficient of All Models?
+Q5_dataFrame = dataFrame[(dataFrame["K Value"] == fixedK)][["Class Balance", "Replicate Imbalance", "Model Architecture", "Matthews Correlation Coefficient"]]
+Q5_Statistics = {"Model Architecture" : [],
+                 "Class Balance Ratio" : [],
+                 "Replicate Imbalance" : [],
+                 "Matthews Correlation Coefficient" : []}
+
+for modelName in architecture:
+    for targetWeight in classBalance:
+        for replicate in replicateImbalance:
+            Q5_Statistics["Model Architecture"].append(modelName)
+            Q5_Statistics["Class Balance Ratio"].append(targetWeight / fixedClassBalance)
+            Q5_Statistics["Replicate Imbalance"].append(replicate)
+            tempDataFrame = Q5_dataFrame[(Q5_dataFrame["Model Architecture"] == modelName) & (Q5_dataFrame["Replicate Imbalance"] == replicate) & (Q5_dataFrame["Class Balance"] == targetWeight)]
+            Q5_Statistics["Matthews Correlation Coefficient"].append(np.mean(tempDataFrame["Matthews Correlation Coefficient"]))
+
+Q5_Plot = pd.DataFrame(Q5_Statistics)
+ax = sns.catplot(x="Class Balance Ratio", y="Matthews Correlation Coefficient", hue="Model Architecture",  data=Q5_Plot, col="Replicate Imbalance", order=[i / fixedClassBalance for i in classBalance], kind="point", ci=None)
+ax.get_legend().set_visible(False)
 plt.subplots_adjust(top=0.9)
-ax.fig.suptitle("Precision of All Models (K Value = {})".format(fixedK))
-plt.savefig(figureDirectory + "fixedK_Precision.png")
-plt.clf()
-
-
-#Q14: (Fixed K) Recall of All Models?
-Q14_dataFrame = dataFrame[(dataFrame["K Value"] == fixedK)][["Class Balance", "Replicate Imbalance", "Model Architecture", "Recall"]]
-ax = sns.catplot(x="Class Balance", y="Recall", hue="Model Architecture",  data=Q14_dataFrame, col="Replicate Imbalance", order=[5, 10, 25, 50], kind="point", ci=None)
-plt.subplots_adjust(top=0.9)
-ax.fig.suptitle("Recall of All Models (K Value = {})".format(fixedK))
-plt.savefig(figureDirectory + "fixedK_Recall.png")
-plt.clf()
-
-
-#Q15: (Fixed K) F1 of All Models?
-Q15_dataFrame = dataFrame[(dataFrame["K Value"] == fixedK)][["Class Balance", "Replicate Imbalance", "Model Architecture", "F1"]]
-ax = sns.catplot(x="Class Balance", y="F1", hue="Model Architecture",  data=Q15_dataFrame, col="Replicate Imbalance", order=[5, 10, 25, 50], kind="point", ci=None)
-plt.subplots_adjust(top=0.9)
-ax.fig.suptitle("F1 of All Models (K Value = {})".format(fixedK))
-plt.savefig(figureDirectory + "fixedK_F1.png")
-plt.clf()
-
-#Q16: (Fixed K) Specificity of All Models?
-Q16_dataFrame = dataFrame[(dataFrame["K Value"] == fixedK)][["Class Balance", "Replicate Imbalance", "Model Architecture", "True Negative Rate"]]
-ax = sns.catplot(x="Class Balance", y="True Negative Rate", hue="Model Architecture",  data=Q16_dataFrame, col="Replicate Imbalance", order=[5, 10, 25, 50], kind="point", ci=None)
-plt.subplots_adjust(top=0.9)
-ax.fig.suptitle("Specificity of All Models (K Value = {})".format(fixedK))
-plt.savefig(figureDirectory + "fixedK_Specificity.png")
-plt.clf()
-
-
-#Q17: (Fixed K) Negative Predictive Value of All Models?
-Q17_dataFrame = dataFrame[(dataFrame["K Value"] == fixedK)][["Class Balance", "Replicate Imbalance", "Model Architecture", "Negative Predictive Value"]]
-ax = sns.catplot(x="Class Balance", y="Negative Predictive Value", hue="Model Architecture",  data=Q17_dataFrame, col="Replicate Imbalance", order=[5, 10, 25, 50], kind="point", ci=None)
-plt.subplots_adjust(top=0.9)
-ax.fig.suptitle("Negative Predictive Value of All Models (K Value = {})".format(fixedK))
-plt.savefig(figureDirectory + "fixedK_NegativePredictiveValue.png")
-plt.clf()
-
-#Q18: (Fixed K) False Discovery Rate of All Models?
-Q18_dataFrame = dataFrame[(dataFrame["K Value"] == fixedK)][["Class Balance", "Replicate Imbalance", "Model Architecture", "False Discovery Rate"]]
-ax = sns.catplot(x="Class Balance", y="False Discovery Rate", hue="Model Architecture",  data=Q18_dataFrame, col="Replicate Imbalance", order=[5, 10, 25, 50], kind="point", ci=None)
-plt.subplots_adjust(top=0.9)
-ax.fig.suptitle("False Discovery Rate of All Models (K Value = {})".format(fixedK))
-plt.savefig(figureDirectory + "fixedK_FalseDiscoveryRate.png")
-plt.clf()
-
-
-#Q19: (Fixed K) False Omission Rate of All Models?
-Q19_dataFrame = dataFrame[(dataFrame["K Value"] == fixedK)][["Class Balance", "Replicate Imbalance", "Model Architecture", "False Omission Rate"]]
-ax = sns.catplot(x="Class Balance", y="False Omission Rate", hue="Model Architecture",  data=Q19_dataFrame, col="Replicate Imbalance", order=[5, 10, 25, 50], kind="point", ci=None)
-plt.subplots_adjust(top=0.9)
-ax.fig.suptitle("False Omission Rate of All Models (K Value = {})".format(fixedK))
-plt.savefig(figureDirectory + "fixedK_FalseOmissionRate.png")
-plt.clf()
-
-#Q20: (Fixed K) Critical Success Index of All Models?
-Q20_dataFrame = dataFrame[(dataFrame["K Value"] == fixedK)][["Class Balance", "Replicate Imbalance", "Model Architecture", "Critical Success Index"]]
-ax = sns.catplot(x="Class Balance", y="Critical Success Index", hue="Model Architecture",  data=Q20_dataFrame, col="Replicate Imbalance", order=[5, 10, 25, 50], kind="point", ci=None)
-plt.subplots_adjust(top=0.9)
-ax.fig.suptitle("Critical Success Index of All Models (K Value = {})".format(fixedK))
-plt.savefig(figureDirectory + "fixedK_CriticalSuccessIndex.png")
-plt.clf()
-
-#Q21: (Fixed K) Matthews Correlation Coefficient of All Models?
-Q21_dataFrame = dataFrame[(dataFrame["K Value"] == fixedK)][["Class Balance", "Replicate Imbalance", "Model Architecture", "Matthews Correlation Coefficient"]]
-ax = sns.catplot(x="Class Balance", y="Matthews Correlation Coefficient", hue="Model Architecture",  data=Q21_dataFrame, col="Replicate Imbalance", order=[5, 10, 25, 50], kind="point", ci=None)
-plt.subplots_adjust(top=0.9)
-ax.fig.suptitle("Matthews Correlation Coefficient of All Models (K Value = {})".format(fixedK))
+ax.fig.suptitle("Deep-KNN Poison Filtering Success (K Value = {})".format(fixedK))
 plt.savefig(figureDirectory + "fixedK_CorrelationCoefficient.png")
+plt.clf()
+
+#Q6: (Fixed K Value) Test Accuracy of All Models?
+Q6_dataFrame = dataFrame[(dataFrame["K Value"] == fixedK)][["Class Balance", "Replicate Imbalance", "Model Architecture", "Test Accuracy"]]
+Q6_Statistics = {"Model Architecture" : [],
+                 "Class Balance Ratio" : [],
+                 "Replicate Imbalance" : [],
+                 "Test Accuracy" : []}
+
+for modelName in architecture:
+    for targetWeight in classBalance:
+        for replicate in replicateImbalance:
+            Q6_Statistics["Model Architecture"].append(modelName)
+            Q6_Statistics["Class Balance Ratio"].append(targetWeight / fixedClassBalance)
+            Q6_Statistics["Replicate Imbalance"].append(replicate)
+            tempDataFrame = Q6_dataFrame[(Q6_dataFrame["Model Architecture"] == modelName) & (Q6_dataFrame["Replicate Imbalance"] == replicate) & (Q6_dataFrame["Class Balance"] == targetWeight)]
+            Q6_Statistics["Test Accuracy"].append(np.mean(tempDataFrame["Test Accuracy"]))
+
+Q6_Plot = pd.DataFrame(Q6_Statistics)
+ax = sns.catplot(x="Class Balance Ratio", y="Test Accuracy", hue="Model Architecture",  data=Q6_Plot, col="Replicate Imbalance", order=[i / fixedClassBalance for i in classBalance], kind="point", ci=None)
+ax.get_legend().set_visible(False)
+plt.subplots_adjust(top=0.9)
+ax.fig.suptitle("Deep-KNN Test Accuracy (K Value = {})".format(fixedK))
+plt.savefig(figureDirectory + "fixedK_TestAccuracy.png")
 plt.clf()

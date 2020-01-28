@@ -11,8 +11,7 @@ saveExcel = "experimentSummary.xlsx"
 architecture = ["DenseNet121", "DPN92", "GoogLeNet", "MobileNetV2", "ResNet18", "ResNet50", "ResNeXt29_2x64d", "SENet18"]
 replicateImbalance = [True, False]
 classBalance = ["5", "10", "25", "50"]
-KValues = ["1", "2", "5", "10", "20", "50", "100", "200"]
-
+KValues = ["2", "5", "10", "20", "50", "75", "90", "100", "110", "125", "200", "400"]
 
 dataFrame = {"Model Architecture" : [],
              "Poison Index" : [],
@@ -23,21 +22,10 @@ dataFrame = {"Model Architecture" : [],
              "True Negative" : [],
              "False Positive" : [],
              "False Negative" : [],
-             "True Positive Rate" : [],
-             "True Negative Rate" : [],
-             "False Positive Rate" : [],
-             "False Negative Rate" : [],
-             "Negative Predictive Value" : [],
-             "False Discovery Rate" : [],
-             "False Omission Rate" : [],
-             "Critical Success Index" : [],
-             "Matthews Correlation Coefficient" : [],
-             "Precision" : [],
-             "Recall" : [],
-             "F1" : [],
              "Train Accuracy" : [],
              "Test Accuracy" : [],
-             "Poisoning Successful on Target Image" : [],
+             "Matthews Correlation Coefficient" : [],
+             "Poison Success on Target Image" : [],
              "Status" : []}
 
 for modelName in architecture:
