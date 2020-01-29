@@ -41,7 +41,7 @@ for modelName in architecture:
 Q1_Plot = pd.DataFrame.from_dict(Q1_Statistics)
 ax = sns.pointplot(x="P Value", y="Attack Success Rate", hue="Model Architecture", data=Q1_Plot)
 plt.title("Transfer Convex Polytope Attack Success (Class Balance = {})".format(fixedClassBalance))
-plt.savefig(figureDirectory + "fixedClassBalance_ModelAgnostic.png")
+plt.savefig(figureDirectory + "fixedClassBalance_ModelAgnostic.pdf")
 plt.clf()
 
 #Q2: (Fixed Class Balance) Matthews Correlation Coefficient of All Models?
@@ -62,7 +62,7 @@ Q2_Plot = pd.DataFrame(Q2_Statistics)
 ax = sns.pointplot(x="P Value", y="Matthews Correlation Coefficient", hue="Model Architecture", ci=None, data=Q2_Plot)
 ax.get_legend().set_visible(False)
 plt.title("Deep-KNN Poison Filtering Success (Class Balance = {})".format(fixedClassBalance))
-plt.savefig(figureDirectory + "fixedClassBalance_CorrelationCoefficient.png")
+plt.savefig(figureDirectory + "fixedClassBalance_CorrelationCoefficient.pdf")
 plt.clf()
 
 #Q3: (Fixed Class Balance) Test Accuracy of All Models?
@@ -82,7 +82,7 @@ Q3_Plot = pd.DataFrame(Q3_Statistics)
 ax = sns.pointplot(x="P Value", y="Test Accuracy", hue="Model Architecture", ci=None, data=Q3_Plot)
 ax.get_legend().set_visible(False)
 plt.title("Deep-KNN Test Accuracy (Class Balance = {})".format(fixedClassBalance))
-plt.savefig(figureDirectory + "fixedClassBalance_TestAccuracy.png")
+plt.savefig(figureDirectory + "fixedClassBalance_TestAccuracy.pdf")
 plt.clf()
 
 #Q4: (Fixed K) Is the effectiveness of KNN Defense Model Specific?
@@ -102,10 +102,10 @@ for modelName in architecture:
             Q4_Statistics["Attack Success Rate"].append(np.sum(tempDataFrame["Poison Success on Target Image"] == True) / float(tempDataFrame.shape[0]))
 
 Q4_Plot = pd.DataFrame.from_dict(Q4_Statistics)
-ax = sns.catplot(x="Class Balance Ratio", y="Attack Success Rate", hue="Model Architecture",  data=Q4_Plot, col="Replicate Imbalance", order=[i / fixedClassBalance for i in classBalance] , kind="point")
+ax = sns.catplot(x="Class Balance Ratio", y="Attack Success Rate", hue="Model Architecture",  data=Q4_Plot, row="Replicate Imbalance", order=[i / fixedClassBalance for i in classBalance], kind="point")
 plt.subplots_adjust(top=0.9)
 ax.fig.suptitle("Transfer Convex Polytope Attack Success (K Value = {})".format(fixedK))
-plt.savefig(figureDirectory + "fixedK_modelAgnostic.png")
+plt.savefig(figureDirectory + "fixedK_modelAgnostic.pdf")
 
 
 #Q5: (Fixed K) Matthews Correlation Coefficient of All Models?
@@ -125,11 +125,10 @@ for modelName in architecture:
             Q5_Statistics["Matthews Correlation Coefficient"].append(np.mean(tempDataFrame["Matthews Correlation Coefficient"]))
 
 Q5_Plot = pd.DataFrame(Q5_Statistics)
-ax = sns.catplot(x="Class Balance Ratio", y="Matthews Correlation Coefficient", hue="Model Architecture",  data=Q5_Plot, col="Replicate Imbalance", order=[i / fixedClassBalance for i in classBalance], kind="point", ci=None)
-ax.get_legend().set_visible(False)
+ax = sns.catplot(x="Class Balance Ratio", y="Matthews Correlation Coefficient", hue="Model Architecture",  data=Q5_Plot, row="Replicate Imbalance", order=[i / fixedClassBalance for i in classBalance], kind="point", ci=None, legend=False)
 plt.subplots_adjust(top=0.9)
 ax.fig.suptitle("Deep-KNN Poison Filtering Success (K Value = {})".format(fixedK))
-plt.savefig(figureDirectory + "fixedK_CorrelationCoefficient.png")
+plt.savefig(figureDirectory + "fixedK_CorrelationCoefficient.pdf")
 plt.clf()
 
 #Q6: (Fixed K Value) Test Accuracy of All Models?
@@ -149,9 +148,8 @@ for modelName in architecture:
             Q6_Statistics["Test Accuracy"].append(np.mean(tempDataFrame["Test Accuracy"]))
 
 Q6_Plot = pd.DataFrame(Q6_Statistics)
-ax = sns.catplot(x="Class Balance Ratio", y="Test Accuracy", hue="Model Architecture",  data=Q6_Plot, col="Replicate Imbalance", order=[i / fixedClassBalance for i in classBalance], kind="point", ci=None)
-ax.get_legend().set_visible(False)
+ax = sns.catplot(x="Class Balance Ratio", y="Test Accuracy", hue="Model Architecture",  data=Q6_Plot, row="Replicate Imbalance", order=[i / fixedClassBalance for i in classBalance], kind="point", ci=None, legend=False)
 plt.subplots_adjust(top=0.9)
 ax.fig.suptitle("Deep-KNN Test Accuracy (K Value = {})".format(fixedK))
-plt.savefig(figureDirectory + "fixedK_TestAccuracy.png")
+plt.savefig(figureDirectory + "fixedK_TestAccuracy.pdf")
 plt.clf()
