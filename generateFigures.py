@@ -14,7 +14,7 @@ if not os.path.isdir(figureDirectory):
 
 architecture = ["DenseNet121", "DPN92", "GoogLeNet", "MobileNetV2", "ResNet18", "ResNet50", "ResNeXt29_2x64d", "SENet18"]
 replicateImbalance = [True, False]
-classBalance = [5, 10, 25, 50]
+classBalance = [2, 5, 7, 10, 12, 15, 20, 25, 35, 50]
 KValues = [2, 5, 10, 20, 50, 75, 90, 100, 110, 125, 200, 400]
 
 fixedClassBalance = 50
@@ -28,18 +28,18 @@ for rowTable in dataFrame.iterrows():
 #Q1: (Fixed Class Balance) Is the effectiveness of KNN Defense Model Specific?
 Q1_dataFrame = dataFrame[(dataFrame["Class Balance"] == fixedClassBalance)][["Model Architecture", "K Value", "Poison Success on Target Image"]]
 Q1_Statistics = {"Model Architecture" : [],
-                 "P Value" : [],
+                 "Normalized-K Ratio" : [],
                  "Attack Success Rate" : []}
 
 for modelName in architecture:
     for K in KValues:
         Q1_Statistics["Model Architecture"].append(modelName)
-        Q1_Statistics["P Value"].append((K / fixedClassBalance))
+        Q1_Statistics["Normalized-K Ratio"].append((K / fixedClassBalance))
         tempDataFrame = Q1_dataFrame[(Q1_dataFrame["Model Architecture"] == modelName) & (Q1_dataFrame["K Value"] == K)]
         Q1_Statistics["Attack Success Rate"].append(np.sum(tempDataFrame["Poison Success on Target Image"] == True) / float(tempDataFrame.shape[0]))
 
 Q1_Plot = pd.DataFrame.from_dict(Q1_Statistics)
-ax = sns.pointplot(x="P Value", y="Attack Success Rate", hue="Model Architecture", data=Q1_Plot)
+ax = sns.pointplot(x="Normalized-K Ratio", y="Attack Success Rate", hue="Model Architecture", data=Q1_Plot)
 plt.title("Transfer Convex Polytope Attack Success (Class Balance = {})".format(fixedClassBalance))
 plt.savefig(figureDirectory + "fixedClassBalance_ModelAgnostic.pdf")
 plt.clf()
@@ -47,19 +47,19 @@ plt.clf()
 #Q2: (Fixed Class Balance) Matthews Correlation Coefficient of All Models?
 Q2_dataFrame = dataFrame[(dataFrame["Class Balance"] == fixedClassBalance)][["K Value", "Model Architecture", "Matthews Correlation Coefficient"]]
 Q2_Statistics = {"Model Architecture" : [],
-                 "P Value" : [],
+                 "Normalized-K Ratio" : [],
                  "Matthews Correlation Coefficient" : []}
 
 for modelName in architecture:
     for K in KValues:
         Q2_Statistics["Model Architecture"].append(modelName)
-        Q2_Statistics["P Value"].append((K / fixedClassBalance))
+        Q2_Statistics["Normalized-K Ratio"].append((K / fixedClassBalance))
         tempDataFrame = Q2_dataFrame[(Q2_dataFrame["Model Architecture"] == modelName) & (Q2_dataFrame["K Value"] == K)]
         Q2_Statistics["Matthews Correlation Coefficient"].append(np.mean(tempDataFrame["Matthews Correlation Coefficient"]))
 
 
 Q2_Plot = pd.DataFrame(Q2_Statistics)
-ax = sns.pointplot(x="P Value", y="Matthews Correlation Coefficient", hue="Model Architecture", ci=None, data=Q2_Plot)
+ax = sns.pointplot(x="Normalized-K Ratio", y="Matthews Correlation Coefficient", hue="Model Architecture", ci=None, data=Q2_Plot)
 ax.get_legend().set_visible(False)
 plt.title("Deep-KNN Poison Filtering Success (Class Balance = {})".format(fixedClassBalance))
 plt.savefig(figureDirectory + "fixedClassBalance_CorrelationCoefficient.pdf")
@@ -68,18 +68,18 @@ plt.clf()
 #Q3: (Fixed Class Balance) Test Accuracy of All Models?
 Q3_dataFrame = dataFrame[(dataFrame["Class Balance"] == fixedClassBalance)][["K Value", "Model Architecture", "Test Accuracy"]]
 Q3_Statistics = {"Model Architecture" : [],
-                 "P Value" : [],
+                 "Normalized-K Ratio" : [],
                  "Test Accuracy" : []}
 
 for modelName in architecture:
     for K in KValues:
         Q3_Statistics["Model Architecture"].append(modelName)
-        Q3_Statistics["P Value"].append((K / fixedClassBalance))
+        Q3_Statistics["Normalized-K Ratio"].append((K / fixedClassBalance))
         tempDataFrame = Q3_dataFrame[(Q3_dataFrame["Model Architecture"] == modelName) & (Q3_dataFrame["K Value"] == K)]
         Q3_Statistics["Test Accuracy"].append(np.mean(tempDataFrame["Test Accuracy"]))
 
 Q3_Plot = pd.DataFrame(Q3_Statistics)
-ax = sns.pointplot(x="P Value", y="Test Accuracy", hue="Model Architecture", ci=None, data=Q3_Plot)
+ax = sns.pointplot(x="Normalized-K Ratio", y="Test Accuracy", hue="Model Architecture", ci=None, data=Q3_Plot)
 ax.get_legend().set_visible(False)
 plt.title("Deep-KNN Test Accuracy (Class Balance = {})".format(fixedClassBalance))
 plt.savefig(figureDirectory + "fixedClassBalance_TestAccuracy.pdf")

@@ -10,7 +10,7 @@ saveExcel = "experimentSummary.xlsx"
 
 architecture = ["DenseNet121", "DPN92", "GoogLeNet", "MobileNetV2", "ResNet18", "ResNet50", "ResNeXt29_2x64d", "SENet18"]
 replicateImbalance = [True, False]
-classBalance = ["5", "10", "25", "50"]
+classBalance = ["2", "5", "7", "10", "12", "15", "20", "25", "35", "50"]
 KValues = ["2", "5", "10", "20", "50", "75", "90", "100", "110", "125", "200", "400"]
 
 dataFrame = {"Model Architecture" : [],

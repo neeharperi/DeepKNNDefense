@@ -5,6 +5,7 @@ from sklearn.neighbors import KNeighborsClassifier
 import numpy as np
 from PIL import Image
 from tqdm import tqdm
+import math
 import copy
 
 import Utilities
@@ -62,10 +63,10 @@ class ConvexPolytopeFineTune_DataLoader(Dataset):
             classWeight = []
 
             for i in self.examples:
-                classWeight.append(int(maxClass / i))
+                classWeight.append(math.ceil(maxClass / i))
 
             for key in self.imageFiles:
-                self.balancedImages = self.balancedImages + classWeight[key] * self.imageFiles[key]
+                self.balancedImages = self.balancedImages + (classWeight[key] * self.imageFiles[key])[0:maxClass]
         else:
             for key in self.imageFiles:
                 self.balancedImages = self.balancedImages + self.imageFiles[key]
