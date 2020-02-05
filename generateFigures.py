@@ -5,6 +5,8 @@ import numpy as np
 import seaborn as sns
 import pdb
 
+plt.rcParams.update({'font.size': 14})
+
 figureDirectory = "./Figures/"
 excelFile = "experimentSummary.xlsx"
 dataFrame = pd.read_excel(excelFile)
@@ -40,8 +42,8 @@ for modelName in architecture:
 
 Q1_Plot = pd.DataFrame.from_dict(Q1_Statistics)
 ax = sns.pointplot(x="Normalized-K Ratio", y="Attack Success Rate", hue="Model Architecture", data=Q1_Plot)
-ax.legend(loc='upper right', ncol=2)
-plt.title("Transfer Convex Polytope Attack Success (Class Balance = {})".format(fixedClassBalance))
+ax.legend(loc='upper right', ncol=2, fontsize="small")
+plt.title("Transfer Convex Polytope Attack Success")
 plt.savefig(figureDirectory + "fixedClassBalance_ModelAgnostic.pdf")
 plt.clf()
 
@@ -62,7 +64,7 @@ for modelName in architecture:
 Q2_Plot = pd.DataFrame(Q2_Statistics)
 ax = sns.pointplot(x="Normalized-K Ratio", y="Matthews Correlation Coefficient", hue="Model Architecture", ci=None, data=Q2_Plot)
 ax.get_legend().set_visible(False)
-plt.title("Deep-KNN Poison Filtering Success (Class Balance = {})".format(fixedClassBalance))
+plt.title("Deep-KNN Poison Filtering Success")
 plt.savefig(figureDirectory + "fixedClassBalance_CorrelationCoefficient.pdf")
 plt.clf()
 
@@ -82,9 +84,12 @@ for modelName in architecture:
 Q3_Plot = pd.DataFrame(Q3_Statistics)
 ax = sns.pointplot(x="Normalized-K Ratio", y="Test Accuracy", hue="Model Architecture", ci=None, data=Q3_Plot)
 ax.get_legend().set_visible(False)
-plt.title("Deep-KNN Test Accuracy (Class Balance = {})".format(fixedClassBalance))
+plt.title("Deep-KNN Test Accuracy")
 plt.savefig(figureDirectory + "fixedClassBalance_TestAccuracy.pdf")
 plt.clf()
+
+
+plt.rcParams.update({'font.size': 20})
 
 #Q4: (Fixed K) Is the effectiveness of KNN Defense Model Specific?
 Q4_dataFrame = dataFrame[(dataFrame["K Value"] == fixedK)][["Model Architecture", "Class Balance", "Replicate Imbalance", "Poison Success on Target Image"]]
@@ -104,11 +109,13 @@ for modelName in architecture:
 
 Q4_Plot = pd.DataFrame.from_dict(Q4_Statistics)
 ax = sns.catplot(x="Class Balance Ratio", y="Attack Success Rate", hue="Model Architecture",  data=Q4_Plot, col="Replicate Imbalance", order=[i / fixedClassBalance for i in classBalance], kind="point", legend=False)
-plt.subplots_adjust(top=0.9)
-ax.fig.suptitle("Transfer Convex Polytope Attack Success (K Value = {})".format(fixedK))
-plt.legend(loc='upper right', ncol=2)
-plt.savefig(figureDirectory + "fixedK_modelAgnostic.pdf")
+plt.subplots_adjust(top=0.85)
+ax.fig.suptitle("Transfer Convex Polytope Attack Success")
+ax.set_xticklabels(rotation=45)
+#plt.legend(loc='upper right', ncol=2)
 
+plt.savefig(figureDirectory + "fixedK_modelAgnostic.pdf")
+plt.clf()
 
 #Q5: (Fixed K) Matthews Correlation Coefficient of All Models?
 Q5_dataFrame = dataFrame[(dataFrame["K Value"] == fixedK)][["Class Balance", "Replicate Imbalance", "Model Architecture", "Matthews Correlation Coefficient"]]
@@ -128,8 +135,9 @@ for modelName in architecture:
 
 Q5_Plot = pd.DataFrame(Q5_Statistics)
 ax = sns.catplot(x="Class Balance Ratio", y="Matthews Correlation Coefficient", hue="Model Architecture",  data=Q5_Plot, col="Replicate Imbalance", order=[i / fixedClassBalance for i in classBalance], kind="point", ci=None, legend=False)
-plt.subplots_adjust(top=0.9)
-ax.fig.suptitle("Deep-KNN Poison Filtering Success (K Value = {})".format(fixedK))
+plt.subplots_adjust(top=0.85)
+ax.fig.suptitle("Deep-KNN Poison Filtering Success")
+ax.set_xticklabels(rotation=45)
 plt.savefig(figureDirectory + "fixedK_CorrelationCoefficient.pdf")
 plt.clf()
 
@@ -151,7 +159,46 @@ for modelName in architecture:
 
 Q6_Plot = pd.DataFrame(Q6_Statistics)
 ax = sns.catplot(x="Class Balance Ratio", y="Test Accuracy", hue="Model Architecture",  data=Q6_Plot, col="Replicate Imbalance", order=[i / fixedClassBalance for i in classBalance], kind="point", ci=None, legend=False)
-plt.subplots_adjust(top=0.9)
-ax.fig.suptitle("Deep-KNN Test Accuracy (K Value = {})".format(fixedK))
+plt.subplots_adjust(top=0.85)
+ax.fig.suptitle("Deep-KNN Test Accuracy")
+ax.set_xticklabels(rotation=45)
 plt.savefig(figureDirectory + "fixedK_TestAccuracy.pdf")
 plt.clf()
+
+
+plt.rcParams.update({'font.size': 13})
+
+dataFrame = pd.read_csv("defenseRates.csv").rename(columns={"Network":"Model Architecture", "Defense":"Defense",
+                                                            "Attack success rate":"Attack Success Rate",
+                                                            "Defense_rate":"Defense Success Rate"})
+
+for rowTable in dataFrame.iterrows():
+    if "k-NN" in rowTable[1]["Defense"]:
+        dataFrame.at[rowTable[0], "Defense"] = "Deep K-NN"
+    elif "SVM" in rowTable[1]["Defense"]:
+        dataFrame.at[rowTable[0], "Defense"] = "One Class SVM"
+    elif "L2" in rowTable[1]["Defense"]:
+        dataFrame.at[rowTable[0], "Defense"] = "L2-Norm Outliers"
+    elif "Adversarial" in rowTable[1]["Defense"]:
+        dataFrame.at[rowTable[0], "Defense"] = "Adversarial Training"
+    elif "Random" in rowTable[1]["Defense"]:
+        dataFrame.at[rowTable[0], "Defense"] = "Random Point Eviction"
+    elif "No" in rowTable[1]["Defense"]:
+        dataFrame.at[rowTable[0], "Defense"] = "No Defense"
+
+    if "ResNeXt" in rowTable[1]["Model Architecture"]:
+        dataFrame.at[rowTable[0], "Model Architecture"] = "ResNeXt"
+
+    if "DenseNet" in rowTable[1]["Model Architecture"]:
+        dataFrame.at[rowTable[0], "Model Architecture"] = "DenseNet"
+
+    if "MobileNet" in rowTable[1]["Model Architecture"]:
+        dataFrame.at[rowTable[0], "Model Architecture"] = "MobileNet"
+
+    if "SENet" in rowTable[1]["Model Architecture"]:
+        dataFrame.at[rowTable[0], "Model Architecture"] = "SENet"
+
+ax = sns.barplot(x="Model Architecture", y="Defense Success Rate", hue="Defense", data=dataFrame)
+ax.legend(loc='upper center', bbox_to_anchor=(0.5, 1.10), ncol=3, fontsize="x-small")
+ax.set_xticklabels(ax.get_xticklabels(), rotation=17)
+plt.savefig(figureDirectory + "ConvexPolytope_CompareDefense.pdf")
