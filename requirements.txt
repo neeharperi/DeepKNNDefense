@@ -3,6 +3,9 @@ torchvision
 opencv-python
 tqdm
 pandas
+xlrd
+seaborn
+matplotlib
 argparse
 pprint
 Pillow
