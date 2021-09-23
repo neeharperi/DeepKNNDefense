@@ -15,6 +15,8 @@ cat modelCheckPoints0* > modelCheckPoints.tar.gz
 tar -xzf modelCheckPoints.tar.gz
 ```
 
+NOTE: This code was written on a multi-GPU setup with nn.DataParallel. You may need to manually adjust the keys of the state dictionaries to load them on your machine.
+
 ## Running All Experiments
 In order to use the pre-trained model files, stitch the modelCheckPointXX files and unzip it into the same root directory. The KNN defense is implemented directly in the dataloader. To test the performance of the KNN defense against pre-generated convex polytope adversarial examples, run:
 
