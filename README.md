@@ -10,10 +10,10 @@ python prepareData.py
 
 Concatinate all modelCheckPoints0X.tar into a single file and extract the combined tarball into a folder "modelCheckPoints"
 
-'''bash
+```bash
 cat modelCheckPoints0* > modelCheckPoints.tar.gz
 tar -xzf modelCheckPoints.tar.gz
-'''
+```
 
 ## Running All Experiments
 In order to use the pre-trained model files, stitch the modelCheckPointXX files and unzip it into the same root directory. The KNN defense is implemented directly in the dataloader. To test the performance of the KNN defense against pre-generated convex polytope adversarial examples, run:
