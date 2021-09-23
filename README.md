@@ -8,7 +8,7 @@ Install required python packages in the requirements.txt file before continuing.
 python prepareData.py
 ```
 
-Concatinate all modelCheckPoints0X.tar into a single file and extract the combined tarball into a folder "modelCheckPoints"
+concatenate all modelCheckPoints0X.tar into a single file and extract the combined tarball into a folder "modelCheckPoints"
 
 ```bash
 cat modelCheckPoints0* > modelCheckPoints.tar.gz
