@@ -11,7 +11,7 @@ python prepareData.py
 concatenate all modelCheckPoints0X.tar into a single file and extract the combined tarball into a folder "modelCheckPoints"
 
 ```bash
-cat modelCheckPoints0* > modelCheckPoints.tar.gz
+cat modelCheckPointParition* > modelCheckPoints.tar.gz
 tar -xzf modelCheckPoints.tar.gz
 ```
 
